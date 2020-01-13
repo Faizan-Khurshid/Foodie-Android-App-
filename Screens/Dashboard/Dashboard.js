@@ -37,7 +37,7 @@ export default class Dashboard extends React.Component {
         return (
             <ScrollView>
                 <View>
-                    <Header />
+                    <Header navigation={this.props.navigation} />
                     {restaurants.map((val, index) => {
                         return (
                             <RestaurantTitle key={index} onRestaurantPress={onRestaurantPress} restaurantName={val.restaurantName} restaurentCatogery={val.restaurentCatogery} restaurantDesc={val.restaurantDesc} restaurantMainPic={val.restaurantMainPic} restaurantLogo={val.restaurantLogo} />

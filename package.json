@@ -8,12 +8,18 @@
     "eject": "expo eject"
   },
   "dependencies": {
+    "axios": "^0.19.1",
     "expo": "~36.0.0",
     "react": "~16.9.0",
     "react-dom": "~16.9.0",
     "react-native": "https://github.com/expo/react-native/archive/sdk-36.0.0.tar.gz",
+    "react-native-gesture-handler": "^1.5.3",
     "react-native-paper": "^3.4.0",
-    "react-native-web": "~0.11.7"
+    "react-native-reanimated": "^1.4.0",
+    "react-native-vector-icons": "^6.6.0",
+    "react-native-web": "~0.11.7",
+    "react-navigation": "^4.0.10",
+    "react-navigation-drawer": "^2.3.3"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",

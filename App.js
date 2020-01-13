@@ -4,6 +4,8 @@ import { DefaultTheme, Provider as PaperProvider } from 'react-native-paper';
 import SignUp from "./Screens/SignUp/SignUp";
 import Dashboard from "./Screens/Dashboard/Dashboard";
 import RestaurantMenu from "./Screens/RestaurantMenu/RestaurantMenu";
+import { createDrawerNavigator } from 'react-navigation-drawer';
+import { createAppContainer } from 'react-navigation';
 const theme = {
   ...DefaultTheme,
   roundness: 2,
@@ -18,27 +20,36 @@ export default class App extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      openRestaurantMenu: false
+      openRestaurantMenu: false,
+      signUp: true
     }
+
   }
   onRestaturantTilePress = () => {
     this.setState({
       openRestaurantMenu: true
     })
   }
+
   render() {
-    const { openRestaurantMenu } = this.state;
+    const { signUp, dashboard, restaurantMenu, openRestaurantMenu } = this.state;
     return (
       <PaperProvider theme={theme}>
-        <View style={styles.container}>
-          {/* <SignUp /> */}
-          {!openRestaurantMenu && <Dashboard onRestaurantPress={this.onRestaturantTilePress} />}
-          {openRestaurantMenu && <RestaurantMenu />}
-        </View>
+        <MyApp /> 
       </PaperProvider>
     );
   }
 }
+
+const MyDrawerNavigation = createDrawerNavigator({
+  // Home: {
+  //   screen: Dashboard
+  // },
+  'Login / Create An Account': {
+    screen: SignUp
+  },
+})
+const MyApp = createAppContainer(MyDrawerNavigation);
 
 const styles = StyleSheet.create({
   container: {
@@ -46,3 +57,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff'
   }
 });
+
+const drawerStyles = {
+  drawer: { shadowColor: '#d70f64', shadowOpacity: 0.8, shadowRadius: 3 },
+  main: { paddingLeft: 3 },
+}
