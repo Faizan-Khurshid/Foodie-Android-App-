@@ -29,19 +29,20 @@ export default class Header extends React.Component {
 
     render() {
         const { isUserSearching } = this.state;
+        const { noMenuIcon, onPrevIconPress, actions } = this.props;
         return (
             isUserSearching ?
                 <SearchBar onBackIconPress={this.onBackIconPress} /> :
                 (
                     <View>
                         <Appbar.Header style={styles.header}>
-                            <Appbar.Action icon="menu" onPress={this.onMenuIconPress} />
+                            {!noMenuIcon ? <Appbar.Action icon="menu" onPress={this.onMenuIconPress} /> : <Appbar.Action icon="arrow-left" onPress={onPrevIconPress} />}
                             <Appbar.Content
                                 title="Foodie"
                                 subtitle="Don't cook Foodie karo"
                             />
-                            <Appbar.Action icon="magnify" onPress={this.onSearchIconPress} />
-                            <Appbar.Action icon="dots-vertical" onPress={this._handleMore} />
+                            {actions && actions.search && <Appbar.Action icon="magnify" onPress={this.onSearchIconPress} />}
+                            {actions && actions.more && <Appbar.Action icon="dots-vertical" onPress={this._handleMore} />}
                         </Appbar.Header>
                     </View>
                 )

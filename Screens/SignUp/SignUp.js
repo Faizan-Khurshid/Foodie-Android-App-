@@ -1,7 +1,7 @@
 import React from 'react';
-import { StyleSheet, ScrollView, View } from 'react-native';
+import { StyleSheet, ScrollView, View, Text, TouchableOpacity } from 'react-native';
 import Header from "../../Components/Header/Header";
-import { TextInput, Headline, FAB, HelperText } from 'react-native-paper';
+import { TextInput, Headline, FAB, HelperText, ActivityIndicator } from 'react-native-paper';
 import axios from "axios";
 
 const FlottingButton = props => (
@@ -13,35 +13,41 @@ const FlottingButton = props => (
     />
 );
 
+
 export default class SignUp extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            submitClicked: false
+            submitClicked: false,
+            // signingin: true
         }
     }
     handleChange = (text, field) => {
+        if (field === "email") {
+            this.setState({
+                emailAlreadyExist: false
+            })
+        }
         this.setState({
             [field]: text
         })
     }
     signUpUser = () => {
-        const { firstName, lastName, email, password, contactNo, submitClicked } = this.state;
+        const { firstName, lastName, email, password, contactNo, submitClicked, emailAlreadyExist } = this.state;
         if (!submitClicked) {
             this.setState({
                 submitClicked: true
             })
         }
-        if (firstName && lastName && email && password && contactNo) {
-            this.props.navigation.navigate('Dashboard')
+        if (firstName && lastName && email && password && contactNo && !emailAlreadyExist) {
+            this.setState({
+                signingin: true
+            })
             axios({
-                method: "post",
-                url: "http://localhost:3030/signup/",
+                method: "POST",
+                url: "http://192.168.8.105:3030/signup",
                 headers: {
-                    // "api-token": ApiInfo.APITOKEN,
-                    "Content-Type": "application/json",
-                    // 'Content-Type': 'application/x-www-form-urlencoded',
-                    // 'Accept': 'application/json'
+                    "Content-Type": "application/json"
                 },
                 data: {
                     firstName,
@@ -52,113 +58,141 @@ export default class SignUp extends React.Component {
                 }
             })
                 .then(response => {
-                    console.log("Sign Up Response", response);
-                    if(response.data._id){
-                        console.log("user signed in")
-                        this.props.navigation.navigate('Dashboard')
+                    this.setState({
+                        signingin: false
+                    })
+                    console.log("Sign Up Response", response.data);
+                    if (response.data._id) {
+                        this.props.navigation.navigate('Login')
+                    } else if (response.data === "User Already Exist") {
+                        this.setState({
+                            signingin: false,
+                            emailAlreadyExist: true
+                        })
                     }
                 })
                 .catch(error => {
+                    this.setState({
+                        signingin: false
+                    })
                     console.log("Sign Up error", error);
                 });
         }
     }
     render() {
-        const { submitClicked } = this.state;
+        const { submitClicked, signingin } = this.state;
         return (
-            <ScrollView>
-                <Header navigation={this.props.navigation} />
+            signingin ?
                 <View>
-                    <View style={styles.formContainer}>
-                        <Headline>Create An Account</Headline>
-                        <TextInput
-                            label='First Name'
-                            value={this.state.firstName}
-                            onChangeText={text => this.handleChange(text, "firstName")}
-                            mode="outlined"
-                            blurOnSubmit={true}
-                            keyboardType="default"
-                        />
-                        {submitClicked && !this.state.firstName && <HelperText
-                            type="error"
-                            visible={submitClicked && !this.state.firstName}
-                        >
-                            Please Enter Your First Name
-                    </HelperText>}
-                        <TextInput
-                            label='Last Name'
-                            value={this.state.lastName}
-                            onChangeText={text => this.handleChange(text, "lastName")}
-                            mode="outlined"
-                            blurOnSubmit={true}
-                            keyboardType="default"
-                        />
-                        {submitClicked && !this.state.lastName && <HelperText
-                            type="error"
-                            visible={submitClicked && !this.state.lastName}
-                        >
-                            Please Enter Your Last Name
-                    </HelperText>}
-                        <TextInput
-                            label='Email'
-                            value={this.state.email}
-                            onChangeText={text => this.handleChange(text, "email")}
-                            mode="outlined"
-                            blurOnSubmit={true}
-                            keyboardType="email-address"
-                        />
-                        {submitClicked && !this.state.email && <HelperText
-                            type="error"
-                            visible={submitClicked && !this.state.email}
-                        >
-                            Please Enter Your Email
-                    </HelperText>}
-                        <TextInput
-                            label='Contact No'
-                            value={this.state.contactNo}
-                            onChangeText={text => this.handleChange(text, "contactNo")}
-                            mode="outlined"
-                            blurOnSubmit={true}
-                            keyboardType="number-pad"
-                        />
-                        {submitClicked && !this.state.contactNo && <HelperText
-                            type="error"
-                            visible={submitClicked && !this.state.contactNo}
-                        >
-                            Please Enter Your Contact No
-                    </HelperText>}
-                        <TextInput
-                            label='Password'
-                            value={this.state.password}
-                            onChangeText={text => this.handleChange(text, "password")}
-                            mode="outlined"
-                            blurOnSubmit={true}
-                            // keyboardType="visible-password"
-                            secureTextEntry={true}
-                        />
-                        {submitClicked && !this.state.password && <HelperText
-                            type="error"
-                            visible={submitClicked && !this.state.password}
-                        >
-                            Please Enter Your Password
-                    </HelperText>}
-                    </View>
-                    <HelperText
-                            type="error"
-                            visible={true}
-                        >
-                            Already a memeber? Log In
-                    </HelperText>
-                    <View style={styles.signUpButtonContainer}>
-                        <FlottingButton changeScreen={this.signUpUser} />
+                    <Header navigation={this.props.navigation} />
+                    <View style={styles.activityContainer}>
+                        <ActivityIndicator animating={signingin} size={80} hidesWhenStopped color={"#d70f64"}/>
                     </View>
                 </View>
-            </ScrollView>
+                :
+                <ScrollView>
+                    <Header navigation={this.props.navigation} />
+                    <View>
+                        <View style={styles.formContainer}>
+                            <Headline>Create An Account</Headline>
+                            <TextInput
+                                label='First Name'
+                                value={this.state.firstName}
+                                onChangeText={text => this.handleChange(text, "firstName")}
+                                mode="outlined"
+                                blurOnSubmit={true}
+                                keyboardType="default"
+                            />
+                            {submitClicked && !this.state.firstName && <HelperText
+                                type="error"
+                                visible={submitClicked && !this.state.firstName}
+                            >
+                                Please Enter Your First Name
+                    </HelperText>}
+                            <TextInput
+                                label='Last Name'
+                                value={this.state.lastName}
+                                onChangeText={text => this.handleChange(text, "lastName")}
+                                mode="outlined"
+                                blurOnSubmit={true}
+                                keyboardType="default"
+                            />
+                            {submitClicked && !this.state.lastName && <HelperText
+                                type="error"
+                                visible={submitClicked && !this.state.lastName}
+                            >
+                                Please Enter Your Last Name
+                    </HelperText>}
+                            <TextInput
+                                label='Email'
+                                value={this.state.email}
+                                onChangeText={text => this.handleChange(text, "email")}
+                                mode="outlined"
+                                blurOnSubmit={true}
+                                keyboardType="email-address"
+                            />
+                            {submitClicked && !this.state.email && <HelperText
+                                type="error"
+                                visible={submitClicked && !this.state.email}
+                            >
+                                Please Enter Your Email
+                            </HelperText>}
+                            {submitClicked && this.state.emailAlreadyExist &&
+                                <HelperText
+                                    type="error"
+                                    visible={submitClicked && this.state.emailAlreadyExist}
+                                    style={{ fontSize: 14 }}
+                                >
+                                    A user is already registered with this email
+                            </HelperText>}
+                            <TextInput
+                                label='Contact No'
+                                value={this.state.contactNo}
+                                onChangeText={text => this.handleChange(text, "contactNo")}
+                                mode="outlined"
+                                blurOnSubmit={true}
+                                keyboardType="number-pad"
+                            />
+                            {submitClicked && !this.state.contactNo && <HelperText
+                                type="error"
+                                visible={submitClicked && !this.state.contactNo}
+                            >
+                                Please Enter Your Contact No
+                    </HelperText>}
+                            <TextInput
+                                label='Password'
+                                value={this.state.password}
+                                onChangeText={text => this.handleChange(text, "password")}
+                                mode="outlined"
+                                blurOnSubmit={true}
+                                // keyboardType="visible-password"
+                                secureTextEntry={true}
+                            />
+                            {submitClicked && !this.state.password && <HelperText
+                                type="error"
+                                visible={submitClicked && !this.state.password}
+                            >
+                                Please Enter Your Password
+                    </HelperText>}
+                            <TouchableOpacity onPress={() => this.props.navigation.navigate('Login')}>
+                                <Text style={{ color: '#d70f64', marginTop: 10 }}>
+                                    Already A Member? Log In
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+                        <View style={styles.signUpButtonContainer}>
+                            <FlottingButton changeScreen={this.signUpUser} />
+                        </View>
+                    </View>
+                </ScrollView>
         );
     }
 }
 
 const styles = StyleSheet.create({
+    activityContainer: {
+        marginTop: "50%"
+    },
     formContainer: {
         marginTop: 30,
         padding: 20,

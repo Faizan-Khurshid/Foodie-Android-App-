@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { StyleSheet, View } from "react-native";
-import { Avatar, Button, Card, Title, Paragraph } from 'react-native-paper';
+import { StyleSheet, View, TouchableOpacity } from "react-native";
+import { Avatar, Button, Card, Subheading, Paragraph } from 'react-native-paper';
 
 
 export default class RestaurantTitle extends React.Component {
@@ -9,22 +9,27 @@ export default class RestaurantTitle extends React.Component {
     this.state = {}
   }
   render() {
-    const { restaurantName, restaurantDesc, restaurentCatogery, restaurantMainPic, restaurantLogo, onRestaurantPress } = this.props;
+    const { restaurant, onRestaurantPress } = this.props;
+    const { restaurantName, restaurantDesc, restaurantMainPic, restaurantLogo, deliveryPrice, minOrder } = restaurant;
     return (
-      <View style={styles.container}>
-        <Card style={styles.card} onPress={onRestaurantPress}>
-          <Card.Title title={restaurantName} subtitle={restaurentCatogery}
-            left={() => <Avatar.Image size={45} source={restaurantLogo} />}
-          />
-          <Card.Cover source={restaurantMainPic} />                    
-          <Card.Content>
-            <Paragraph>{restaurantDesc}</Paragraph>
-          </Card.Content>
-          <Card.Actions style={{justifyContent: 'flex-end'}}>
-            <Button onPress={onRestaurantPress}>View</Button>
-          </Card.Actions>
-        </Card>
-      </View>
+      <TouchableOpacity>
+        <View style={styles.container}>
+          <Card style={styles.card} onPress={() => onRestaurantPress(restaurant)}>
+            <Card.Title title={restaurantName}
+              left={() => <Avatar.Image size={45} source={restaurantLogo} />}
+            />
+            <Card.Cover source={restaurantMainPic} />
+            <Card.Content>
+              <Subheading style={{ fontSize: 16 }}>{restaurantDesc}</Subheading>
+              <Paragraph>Rs {minOrder} minimum</Paragraph>
+              <Paragraph>Rs {deliveryPrice} Delivery fee</Paragraph>
+            </Card.Content>
+            <Card.Actions style={{ justifyContent: 'flex-end' }}>
+              <TouchableOpacity><Button onPress={() => onRestaurantPress(restaurant)}>View</Button></TouchableOpacity>
+            </Card.Actions>
+          </Card>
+        </View>
+      </TouchableOpacity>
     )
   }
 };
